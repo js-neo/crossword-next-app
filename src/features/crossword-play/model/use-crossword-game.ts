@@ -17,6 +17,15 @@ export function useCrosswordGame() {
   const [values, setValues] = useState<ValueMap>({});
   const [statuses, setStatuses] = useState<StatusMap>({});
   const [selectedEntryId, setSelectedEntryId] = useState<number | null>(null);
+  const [checkResult, setCheckResult] = useState<{
+    checked: boolean;
+    correctCount: number;
+    wrongCount: number;
+  }>({
+    checked: false,
+    correctCount: 0,
+    wrongCount: 0,
+  });
 
   const totalCells = built.cells.length;
   const filledCells = built.cells.filter((cell) => {
@@ -39,12 +48,23 @@ export function useCrosswordGame() {
       ...prev,
       [key]: "idle",
     }));
+
+    setCheckResult({
+      checked: false,
+      correctCount: 0,
+      wrongCount: 0,
+    });
   };
 
   const reset = () => {
     setValues({});
     setStatuses({});
     setSelectedEntryId(null);
+    setCheckResult({
+      checked: false,
+      correctCount: 0,
+      wrongCount: 0,
+    });
   };
 
   const reveal = () => {
@@ -59,30 +79,43 @@ export function useCrosswordGame() {
 
     setValues(nextValues);
     setStatuses(nextStatuses);
+    setCheckResult({
+      checked: true,
+      correctCount: built.cells.length,
+      wrongCount: 0,
+    });
   };
 
   const check = () => {
     const nextStatuses: StatusMap = {};
+    let correctCount = 0;
+    let wrongCount = 0;
 
     for (const cell of built.cells) {
       const key = keyOf(cell);
       const current = (values[key] ?? "").toUpperCase();
-      if (!current) {
-        nextStatuses[key] = "wrong";
-      } else if (current === cell.solution) {
+
+      if (current && current === cell.solution) {
         nextStatuses[key] = "correct";
+        correctCount += 1;
       } else {
         nextStatuses[key] = "wrong";
+        wrongCount += 1;
       }
     }
 
     setStatuses(nextStatuses);
+    setCheckResult({
+      checked: true,
+      correctCount,
+      wrongCount,
+    });
   };
 
-  const solved = built.cells.every((cell) => {
-    const key = keyOf(cell);
-    return (values[key] ?? "").toUpperCase() === cell.solution;
-  });
+  const solved =
+      checkResult.checked &&
+      checkResult.wrongCount === 0 &&
+      checkResult.correctCount === built.cells.length;
 
   return {
     data: crosswordData,
@@ -99,5 +132,6 @@ export function useCrosswordGame() {
     reset,
     reveal,
     check,
+    checkResult,
   };
 }

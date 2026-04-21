@@ -72,8 +72,7 @@ export function CrosswordBoard({
 
         if (currentIndex === -1) return;
 
-        const nextIndex =
-            direction === "next" ? currentIndex + 1 : currentIndex - 1;
+        const nextIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
 
         if (nextIndex < 0 || nextIndex >= cells.length) return;
 
@@ -109,23 +108,33 @@ export function CrosswordBoard({
                         const isActive =
                             selectedEntryId !== null && cell.entries.includes(selectedEntryId);
 
+                        let visualClass =
+                            "border-slate-300 bg-white text-slate-900";
+
+                        if (status === "correct") {
+                            visualClass = "border-emerald-700 bg-emerald-300 text-emerald-950";
+                        } else if (status === "wrong") {
+                            visualClass = "border-rose-700 bg-rose-300 text-rose-950";
+                        } else if (status === "revealed") {
+                            visualClass = "border-amber-700 bg-amber-300 text-amber-950";
+                        } else if (isActive) {
+                            visualClass = "border-indigo-700 bg-indigo-200 text-slate-900 ring-2 ring-indigo-400";
+                        }
+
                         return (
                             <label
                                 key={key}
                                 className={cn(
-                                    "relative flex h-[42px] w-[42px] items-center justify-center rounded-sm border text-center transition-colors",
-                                    "border-slate-300 bg-white",
-                                    isActive && "border-indigo-600 bg-indigo-100 ring-2 ring-indigo-300",
-                                    status === "correct" && "border-emerald-500 bg-emerald-100",
-                                    status === "wrong" && "border-rose-500 bg-rose-100",
-                                    status === "revealed" && "border-amber-500 bg-amber-100",
+                                    "relative flex h-[42px] w-[42px] items-center justify-center rounded-sm border text-center transition-all",
+                                    visualClass,
                                 )}
                             >
                                 {cell.number ? (
-                                    <span className="absolute left-1 top-0.5 text-[10px] font-medium text-slate-500">
+                                    <span className="absolute left-1 top-0.5 text-[10px] font-medium text-slate-600">
                     {cell.number}
                   </span>
                                 ) : null}
+
                                 <input
                                     ref={(el) => {
                                         inputRefs.current[key] = el;
@@ -167,7 +176,7 @@ export function CrosswordBoard({
                                     }}
                                     maxLength={1}
                                     autoComplete="off"
-                                    className="h-full w-full rounded-sm bg-transparent text-center text-lg font-bold uppercase text-slate-900 caret-indigo-600"
+                                    className="h-full w-full rounded-sm border-0 bg-transparent text-center text-lg font-bold uppercase text-inherit caret-indigo-700 outline-none"
                                     aria-label={`Ячейка ${key}`}
                                 />
                             </label>

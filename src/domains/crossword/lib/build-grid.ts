@@ -25,6 +25,9 @@ export function buildCrosswordGrid(data: CrosswordData): BuiltCrossword {
         }
 
         existing.entries.push(entry.id);
+        if (index === 0 && existing.number === undefined) {
+          existing.number = entry.id;
+        }
       } else {
         cellMap.set(key, {
           row,
